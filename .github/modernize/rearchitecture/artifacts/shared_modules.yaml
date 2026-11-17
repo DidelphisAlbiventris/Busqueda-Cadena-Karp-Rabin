@@ -1,0 +1,2 @@
+modules: []
+notes: "No hay módulos usados por dos unidades externas; el proyecto contiene una única unidad interactiva. Los imports compartidos dentro de esa unidad no constituyen una frontera entre unidades."

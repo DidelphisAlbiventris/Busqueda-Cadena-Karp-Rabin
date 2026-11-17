@@ -1,0 +1,48 @@
+unit: interactive-search
+side_effects:
+  - source_loc: "src/App.jsx:12"
+    effect: "Reemplaza el estado de simulación al generar un patrón y un nuevo texto."
+    must_preserve: true
+  - source_loc: "src/App.jsx:20"
+    effect: "Reinicia el recorrido sobre el mismo patrón y texto, limpiando historial y coincidencias."
+    must_preserve: true
+branches:
+  - source_loc: "src/formulario.jsx:10"
+    condition: "validatePattern devuelve un mensaje de error"
+    behavior: "Muestra el error y no genera una simulación."
+    must_preserve: true
+  - source_loc: "src/lib/karpRabin.js:77"
+    condition: "La simulación está en estado ready"
+    behavior: "El primer avance calcula únicamente el hash del patrón y pasa a searching."
+    must_preserve: true
+  - source_loc: "src/lib/karpRabin.js:96"
+    condition: "El hash de la ventana coincide con el del patrón"
+    behavior: "Compara también los caracteres; solo una igualdad completa cuenta como coincidencia."
+    must_preserve: true
+  - source_loc: "src/lib/karpRabin.js:115"
+    condition: "La ventana actual es la última"
+    behavior: "Cambia el estado a complete y la interfaz deshabilita Siguiente paso."
+    must_preserve: true
+error_paths:
+  - source_loc: "src/lib/karpRabin.js:19"
+    trigger: "Patrón con longitud fuera de 2 a 4 caracteres al generar texto."
+    outcome: "Lanza RangeError con el mensaje de validación."
+    contract: "RangeError"
+    must_preserve: true
+  - source_loc: "src/lib/karpRabin.js:46"
+    trigger: "Patrón inválido al crear una simulación."
+    outcome: "Lanza RangeError con el mensaje de validación."
+    contract: "RangeError"
+    must_preserve: true
+  - source_loc: "src/lib/karpRabin.js:50"
+    trigger: "Texto recibido más corto que el patrón."
+    outcome: "Lanza RangeError indicando que el texto no puede ser más corto."
+    contract: "RangeError"
+    must_preserve: true
+concurrency:
+  model: sync
+  tx_boundary:
+    source_loc: "src/App.jsx:16"
+    scope: "Cada evento de avance realiza una transición sincrónica e inmutable del estado React."
+    isolation: "N/A"
+    must_preserve: true

@@ -1,0 +1,39 @@
+unit: interactive-search
+bindings:
+  - type: route-declaration
+    name: "SPA fallback entrypoint"
+    source_loc: "index.html:16"
+    target: "#root / src/main.jsx"
+    must_appear_in_target: true
+    notes: "Vite sirve el documento raíz y React monta la aplicación sin router interno."
+  - type: convention
+    name: "React StrictMode"
+    source_loc: "src/main.jsx:7"
+    target: "<App />"
+    must_appear_in_target: true
+    notes: "Activa comprobaciones adicionales durante desarrollo."
+  - type: convention
+    name: "Formulario submit"
+    source_loc: "src/formulario.jsx:19"
+    target: "handleSubmit"
+    must_appear_in_target: true
+    notes: "El envío evita la navegación HTML y valida antes de generar."
+  - type: convention
+    name: "Botón de avance"
+    source_loc: "src/components/Simulation.jsx:68"
+    target: "onNext"
+    must_appear_in_target: true
+    notes: "Se deshabilita cuando no existe simulación o el recorrido está completo."
+runtime_config:
+  - key: "document.getElementById('root')"
+    source_loc: "src/main.jsx:6"
+    source: html
+    default_value: "N/A"
+    must_appear_in_target: true
+    notes: "Punto de montaje requerido por el documento HTML."
+  - key: "HASH_BASE / HASH_MODULUS / TEXT_LENGTH"
+    source_loc: "src/lib/karpRabin.js:1"
+    source: code
+    default_value: "256 / 101 / 30"
+    must_appear_in_target: true
+    notes: "Constantes educativas que definen el cálculo y el tamaño del texto generado."

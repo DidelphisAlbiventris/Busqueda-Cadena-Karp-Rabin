@@ -1,0 +1,15 @@
+unit: interactive-search
+commit: false
+candidate_splits:
+  - id: "src/lib/karpRabin.js:7-117"
+    drivers: [concern_split]
+    rationale: "La validación y la generación de datos conviven con las transiciones del algoritmo; una separación podría reducir el acoplamiento entre dominio y simulación sin alterar el comportamiento observable."
+    source_slice:
+      file: src/lib/karpRabin.js
+      lines: [7, 117]
+  - id: "src/components/Simulation.jsx:3-21"
+    drivers: [concern_split, reuse_split]
+    rationale: "StepMessage concentra la traducción del estado algorítmico a texto visible y podría aislarse para hacer más legible el componente principal o reutilizar sus estados."
+    source_slice:
+      file: src/components/Simulation.jsx
+      lines: [3, 21]

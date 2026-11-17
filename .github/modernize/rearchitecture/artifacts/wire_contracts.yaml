@@ -1,0 +1,2 @@
+contracts: []
+notes: "La aplicación no expone APIs HTTP, mensajes, persistencia ni integraciones externas; su contrato observable es la interfaz de la SPA y está descrito en el artefacto de comportamiento y bindings."

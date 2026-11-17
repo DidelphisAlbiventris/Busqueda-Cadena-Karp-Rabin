@@ -1,0 +1,27 @@
+units:
+  - name: interactive-search
+    trigger: page
+    trigger_detail: "SPA raíz: interacción del formulario, botón Generar cadena, botón Siguiente paso y Reiniciar recorrido"
+    source_anchors:
+      - path: index.html
+        line: 16
+      - path: src/main.jsx
+        line: 6
+      - path: src/App.jsx
+        line: 8
+      - path: src/formulario.jsx
+        line: 4
+      - path: src/components/Simulation.jsx
+        line: 24
+      - path: src/components/SequenceView.jsx
+        line: 4
+      - path: src/components/ComparisonLog.jsx
+        line: 1
+      - path: src/components/HashDetails.jsx
+        line: 3
+      - path: src/lib/karpRabin.js
+        line: 7
+    exported_signature: []
+    dynamic_entrypoints: []
+    depends_on: []
+    shared_refs: []

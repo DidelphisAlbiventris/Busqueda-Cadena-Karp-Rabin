@@ -1,0 +1,2 @@
+flows: []
+notes: "No existen varias unidades ni estado implícito entre páginas, sesiones, cookies, headers o servicios. El estado de la simulación es explícito en App y se propaga por props/callbacks."
