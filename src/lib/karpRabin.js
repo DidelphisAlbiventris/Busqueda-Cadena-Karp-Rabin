@@ -1,6 +1,6 @@
 export const TEXT_LENGTH = 30
 export const MIN_PATTERN_LENGTH = 2
-export const MAX_PATTERN_LENGTH = 4
+export const MAX_PATTERN_LENGTH = 5
 export const HASH_BASE = 256
 export const HASH_MODULUS = 101
 
@@ -8,7 +8,7 @@ export function validatePattern(pattern) {
   const length = Array.from(pattern).length
 
   if (length < MIN_PATTERN_LENGTH || length > MAX_PATTERN_LENGTH) {
-    return 'Escribe una cadena de entre 2 y 4 caracteres.'
+    return `Escribe una cadena de entre ${MIN_PATTERN_LENGTH} y ${MAX_PATTERN_LENGTH} caracteres.`
   }
 
   return ''
@@ -30,15 +30,43 @@ export function generateText(pattern, random = Math.random) {
   return characters.join('')
 }
 
+export function calculateHashSteps(value) {
+  const characters = Array.from(value)
+  let hash = 0
+
+  return characters.map((character, index) => {
+    const codePoint = character.codePointAt(0)
+    const exponent = characters.length - index - 1
+    const power = modularPower(HASH_BASE, exponent)
+    const term = (codePoint * power) % HASH_MODULUS
+    hash = modulo(hash + term)
+
+    return {
+      character,
+      position: index + 1,
+      codePoint,
+      exponent,
+      power,
+      term,
+      hash,
+    }
+  })
+}
+
 export function calculateHash(value) {
-  return Array.from(value).reduce(
-    (hash, character) => (hash * HASH_BASE + character.codePointAt(0)) % HASH_MODULUS,
-    0,
-  )
+  return calculateHashSteps(value).at(-1)?.hash ?? 0
 }
 
 function modulo(value) {
   return ((value % HASH_MODULUS) + HASH_MODULUS) % HASH_MODULUS
+}
+
+function modularPower(base, exponent) {
+  let result = 1
+  for (let index = 0; index < exponent; index += 1) {
+    result = (result * base) % HASH_MODULUS
+  }
+  return result
 }
 
 export function createSimulation(pattern, text = generateText(pattern)) {
@@ -51,10 +79,7 @@ export function createSimulation(pattern, text = generateText(pattern)) {
     throw new RangeError('La cadena generada no puede ser más corta que el patrón.')
   }
 
-  let highestPower = 1
-  for (let index = 1; index < patternLength; index += 1) {
-    highestPower = (highestPower * HASH_BASE) % HASH_MODULUS
-  }
+  const highestPower = modularPower(HASH_BASE, patternLength - 1)
 
   return {
     pattern,
@@ -64,6 +89,7 @@ export function createSimulation(pattern, text = generateText(pattern)) {
     highestPower,
     windowCount: characters.length - patternLength + 1,
     patternHash: null,
+    patternHashSteps: [],
     history: [],
     matchIndexes: [],
     status: 'ready',
@@ -78,6 +104,7 @@ export function advanceSimulation(simulation) {
     return {
       ...simulation,
       patternHash: calculateHash(simulation.pattern),
+      patternHashSteps: calculateHashSteps(simulation.pattern),
       status: 'searching',
     }
   }
@@ -100,6 +127,7 @@ export function advanceSimulation(simulation) {
     index,
     substring,
     hash,
+    hashSteps: calculateHashSteps(substring),
     hashMatches,
     isMatch,
     isCollision: hashMatches && !isMatch,

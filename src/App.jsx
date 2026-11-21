@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Formulario from './formulario.jsx'
 import Simulation from './components/Simulation.jsx'
 import ComparisonLog from './components/ComparisonLog.jsx'
@@ -7,16 +7,34 @@ import universityLogo from './assets/logo.png'
 
 export default function App() {
   const [simulation, setSimulation] = useState(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+
+  useEffect(() => {
+    if (!isPlaying || !simulation || simulation.status === 'complete') return
+
+    const timer = setTimeout(() => {
+      setSimulation((current) => current ? advanceSimulation(current) : current)
+    }, 1500)
+
+    return () => clearTimeout(timer)
+  }, [isPlaying, simulation])
+
+  useEffect(() => {
+    if (simulation?.status === 'complete') setIsPlaying(false)
+  }, [simulation?.status])
 
   function handleGenerate(pattern) {
+    setIsPlaying(false)
     setSimulation(createSimulation(pattern))
   }
 
   function handleNext() {
+    setIsPlaying(false)
     setSimulation((current) => current ? advanceSimulation(current) : current)
   }
 
   function handleRestart() {
+    setIsPlaying(false)
     setSimulation((current) => current ? createSimulation(current.pattern, current.text) : current)
   }
 
@@ -38,18 +56,22 @@ export default function App() {
         <div className="workspace">
           <Formulario onGenerate={handleGenerate} />
           <section className="panel count-panel" aria-labelledby="count-heading">
-            <h2 id="count-heading">Coincidencias</h2>
+            <h2 id="count-heading">Posiciones encontradas</h2>
             <p className="count-value" aria-live="polite" aria-atomic="true">
-              <span className="sr-only">Coincidencias encontradas: </span>
-              {simulation?.matchIndexes.length ?? 0}
+              {simulation?.matchIndexes.length ? simulation.matchIndexes.join(', ') : '—'}
             </p>
+            <p className="field-hint">Índices de inicio, desde 0.</p>
           </section>
-          <Simulation simulation={simulation} onNext={handleNext} onRestart={handleRestart} />
+          <Simulation simulation={simulation} onNext={handleNext} onRestart={handleRestart} isPlaying={isPlaying} onTogglePlay={() => setIsPlaying((current) => !current)} />
         </div>
         <ComparisonLog history={simulation?.history ?? []} />
       </main>
 
-      <footer className="site-footer">Aplicación web educativa para el curso Análisis de Algoritmos · compatible con GitHub Pages</footer>
+      <footer className="site-footer">
+        <span>Aplicación web educativa para el curso Análisis de Algoritmos · compatible con GitHub Pages</span>
+        <a href="mailto:johanalexisbv@ufps.edu.co">johanalexisbv@ufps.edu.co</a>
+        <span>Versión 1.0.1</span>
+      </footer>
     </div>
   )
 }

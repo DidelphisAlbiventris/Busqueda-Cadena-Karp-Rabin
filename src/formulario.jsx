@@ -34,13 +34,13 @@ export default function Formulario({ onGenerate }) {
                 setError('')
               }}
             />
-            <span className={length > 4 ? 'character-count character-count--error' : 'character-count'} aria-hidden="true">
-              {length}/4
+            <span className={length > 5 ? 'character-count character-count--error' : 'character-count'} aria-hidden="true">
+              {length}/5
             </span>
           </div>
           <button className="button button--primary generate-button" type="submit">Generar cadena</button>
         </div>
-        <p id="pattern-hint" className="field-hint">De 2 a 4 caracteres · distingue mayúsculas y minúsculas.</p>
+        <p id="pattern-hint" className="field-hint">De 2 a 5 caracteres · distingue mayúsculas y minúsculas.</p>
         {error && <p id="pattern-error" className="field-error" role="alert">{error}</p>}
       </form>
     </section>

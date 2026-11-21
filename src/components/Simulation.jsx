@@ -1,27 +1,7 @@
 import SequenceView from './SequenceView.jsx'
+import HashDetails from './HashDetails.jsx'
 
-function StepMessage({ simulation, current }) {
-  if (!simulation) return null
-
-  let message = 'Cadena lista para iniciar.'
-  let tone = ''
-
-  if (simulation.status !== 'ready' && !current) {
-    message = `El hash del patrón “${simulation.pattern}” es ${simulation.patternHash}.`
-  } else if (current?.isMatch) {
-    message = `Se ha encontrado una coincidencia: “${current.substring}” es igual a “${simulation.pattern}”.`
-    tone = ' step-message--match'
-  } else if (current?.isCollision) {
-    message = `Colisión: los hashes coinciden, pero “${current.substring}” no es igual a “${simulation.pattern}”.`
-    tone = ' step-message--collision'
-  } else if (current) {
-    message = `“${current.substring}” no es igual a “${simulation.pattern}”.`
-  }
-
-  return <p className={`step-message${tone}`} role="status" aria-live="polite" aria-atomic="true">{message}</p>
-}
-
-export default function Simulation({ simulation, onNext, onRestart }) {
+export default function Simulation({ simulation, onNext, onRestart, isPlaying, onTogglePlay }) {
   const current = simulation?.history.at(-1)
   const complete = simulation?.status === 'complete'
   const step = simulation ? simulation.history.length + (simulation.patternHash !== null ? 1 : 0) : 0
@@ -43,7 +23,7 @@ export default function Simulation({ simulation, onNext, onRestart }) {
           <div className="hash-card">
             <span className="hash-label">Patrón</span>
             <code className="hash-word">{simulation.pattern}</code>
-            <div className="hash-value"><span>Hash</span><strong>{simulation.patternHash ?? '—'}</strong></div>
+            <div className="hash-value"><span>Hash</span><strong>{simulation.patternHash === null ? '—' : String(simulation.patternHash)}</strong></div>
           </div>
           <span className="comparison-sign" aria-label={current ? current.hashMatches ? 'Hashes iguales' : 'Hashes distintos' : 'Sin comparar'}>
             {current ? current.hashMatches ? '=' : '≠' : '?'}
@@ -51,12 +31,10 @@ export default function Simulation({ simulation, onNext, onRestart }) {
           <div className={`hash-card${current?.isMatch ? ' hash-card--match' : ''}`}>
             <span className="hash-label">{current ? `Ventana · índice ${current.index}` : 'Ventana actual'}</span>
             <code className="hash-word">{current?.substring ?? '—'}</code>
-            <div className="hash-value"><span>Hash</span><strong>{current?.hash ?? '—'}</strong></div>
+            <div className="hash-value"><span>Hash</span><strong>{current ? String(current.hash) : '—'}</strong></div>
           </div>
         </div>
       )}
-
-      <StepMessage simulation={simulation} current={current} />
 
       <div className="simulation-controls">
         <div className="progress-info">
@@ -65,17 +43,24 @@ export default function Simulation({ simulation, onNext, onRestart }) {
         </div>
         <div className="control-buttons">
           {simulation && <button className="button button--secondary" type="button" onClick={onRestart}>Reiniciar recorrido</button>}
+          <button className="button button--secondary" type="button" disabled={!simulation || complete} onClick={onTogglePlay} aria-pressed={isPlaying}>
+            {isPlaying ? 'Pausar reproducción' : 'Reproducir automáticamente'}
+          </button>
           <button className="button button--primary button--next" type="button" disabled={!simulation || complete} onClick={onNext}>
             Siguiente paso <span aria-hidden="true">→</span>
           </button>
         </div>
       </div>
 
+      {simulation && <HashDetails simulation={simulation} />}
+
       {complete && (
         <section className="final-result" role="status" aria-live="polite" aria-labelledby="result-heading">
           <div>
             <h3 id="result-heading">Recorrido completado</h3>
-            <p>La cantidad de coincidencias de la cadena {simulation.pattern} es de {simulation.matchIndexes.length} veces.</p>
+            <p>{simulation.matchIndexes.length
+              ? `Posiciones de inicio de “${simulation.pattern}”: ${simulation.matchIndexes.join(', ')} (índices desde 0).`
+              : `No se encontraron coincidencias de “${simulation.pattern}”.`}</p>
           </div>
         </section>
       )}

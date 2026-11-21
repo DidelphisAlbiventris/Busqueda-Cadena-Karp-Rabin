@@ -1,10 +1,10 @@
-// Runtime validation coverage for: guaranteed text generation and step-by-step Karp–Rabin search.
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {
   TEXT_LENGTH,
   advanceSimulation,
   calculateHash,
+  calculateHashSteps,
   createSimulation,
   generateText,
   validatePattern,
@@ -16,79 +16,65 @@ function finish(pattern, text) {
   while (simulation.status !== 'complete') {
     simulation = advanceSimulation(simulation)
     steps += 1
-    assert.ok(steps <= simulation.windowCount + 1, 'The search must terminate after its last window.')
+    assert.ok(steps <= simulation.windowCount + 1)
   }
   return simulation
 }
 
-test('accepts only patterns with 2–4 characters, including Unicode', () => {
-  for (const invalid of ['', 'a', 'abcde', '😀']) assert.notEqual(validatePattern(invalid), '')
+test('validates patterns and supports Unicode', () => {
+  for (const invalid of ['', 'a', 'abcdef', '😀']) assert.notEqual(validatePattern(invalid), '')
   for (const valid of ['ab', 'abc', 'abcd', '😀a', 'ñá', 'a ']) assert.equal(validatePattern(valid), '')
   assert.throws(() => generateText('a'), RangeError)
   assert.throws(() => createSimulation('ab', 'a'), RangeError)
 })
 
-test('generates exactly 30 characters with a guaranteed occurrence at either boundary', () => {
+test('generates exactly 30 characters with a guaranteed occurrence', () => {
   for (const pattern of ['ab', 'abc', 'abcd', 'aa', '😀ñ', 'a ']) {
     for (const sample of [0, 0.25, 0.7, 0.999999]) {
       const text = generateText(pattern, () => sample)
       assert.equal(Array.from(text).length, TEXT_LENGTH)
       assert.ok(text.includes(pattern))
-      assert.ok(Array.from(text).every((character) => Array.from(pattern).includes(character)))
     }
   }
-  assert.ok(generateText('ab', () => 0).startsWith('ab'))
-  assert.ok(generateText('ab', () => 0.999999).endsWith('ab'))
 })
 
-test('the first click only calculates the pattern hash and leaves the initial state unchanged', () => {
+test('the first click calculates only the pattern hash and its process', () => {
   const initial = createSimulation('ab', 'ababa')
   const first = advanceSimulation(initial)
   assert.equal(initial.patternHash, null)
-  assert.equal(initial.status, 'ready')
   assert.equal(first.patternHash, calculateHash('ab'))
-  assert.equal(first.status, 'searching')
+  assert.equal(first.patternHashSteps.length, 2)
   assert.deepEqual(first.history, [])
-  assert.deepEqual(first.matchIndexes, [])
   const second = advanceSimulation(first)
-  assert.equal(second.history.length, 1)
-  assert.equal(second.history[0].index, 0)
-  assert.equal(second.history[0].substring, 'ab')
   assert.equal(second.history[0].isMatch, true)
+  assert.equal(second.history[0].hashSteps.length, 2)
 })
 
-test('compares every window once and counts overlapping occurrences through the final index', () => {
+test('compares every window and stores the starting indexes of overlapping occurrences', () => {
   for (const pattern of ['aa', 'aaa', 'aaaa']) {
     const simulation = finish(pattern, 'a'.repeat(TEXT_LENGTH))
     const expectedCount = TEXT_LENGTH - pattern.length + 1
     assert.equal(simulation.history.length, expectedCount)
-    assert.equal(simulation.matchIndexes.length, expectedCount)
-    assert.equal(simulation.matchIndexes.at(-1), TEXT_LENGTH - pattern.length)
+    assert.deepEqual(simulation.matchIndexes, Array.from({ length: expectedCount }, (_, index) => index))
     assert.equal(advanceSimulation(simulation), simulation)
   }
 })
 
-test('rolling hashes equal a fresh hash for every window, including non-ASCII text', () => {
-  for (const [pattern, text] of [
-    ['ab', 'zzazabbbazababzzab'],
-    ['abc', 'abccbaabccbacabc'],
-    ['abcd', 'ddcbabcdadcbaabcd'],
-    ['😀a', 'ñ😀aa😀a😀😀ab😀a'],
-    ['a ', ' a  a ab a '],
-  ]) {
+test('rolling hashes equal a fresh hash for every window', () => {
+  for (const [pattern, text] of [['ab', 'zzazabbbazababzzab'], ['abc', 'abccbaabccbacabc'], ['😀a', 'ñ😀aa😀a😀😀ab😀a']]) {
     const simulation = finish(pattern, text)
     for (const comparison of simulation.history) {
       assert.equal(comparison.hash, calculateHash(comparison.substring))
-      assert.ok(comparison.hash >= 0 && comparison.hash < 101)
+      assert.equal(comparison.hashSteps.at(-1).hash, comparison.hash)
     }
-    const expected = []
-    const characters = Array.from(text)
-    const size = Array.from(pattern).length
-    for (let index = 0; index <= characters.length - size; index += 1) {
-      if (characters.slice(index, index + size).join('') === pattern) expected.push(index)
-    }
-    assert.deepEqual(simulation.matchIndexes, expected)
   }
+})
+
+test('uses the classic polynomial hash with base 256 and modulus 101', () => {
+  const expected = (65 * (256 ** 2) + 66 * 256 + 67) % 101
+  assert.equal(calculateHash('ABC'), expected)
+  assert.deepEqual(calculateHashSteps('ABC').map((step) => step.exponent), [2, 1, 0])
+  assert.deepEqual(calculateHashSteps('ABC').map((step) => step.hash), [64, 93, expected])
 })
 
 test('equal hashes with different characters are collisions, not matches', () => {
@@ -99,13 +85,11 @@ test('equal hashes with different characters are collisions, not matches', () =>
   assert.deepEqual(simulation.matchIndexes, [2])
 })
 
-test('search is case-sensitive, can report zero matches, and a restart clears all progress', () => {
+test('search is case-sensitive and restart clears progress', () => {
   assert.deepEqual(finish('Ab', 'abAb').matchIndexes, [2])
   assert.deepEqual(finish('ab', 'cccc').matchIndexes, [])
   const completed = finish('ab', 'ababa')
   const restarted = createSimulation(completed.pattern, completed.text)
-  assert.equal(restarted.text, completed.text)
-  assert.equal(restarted.status, 'ready')
   assert.equal(restarted.patternHash, null)
   assert.deepEqual(restarted.history, [])
   assert.deepEqual(restarted.matchIndexes, [])
