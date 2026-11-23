@@ -23,9 +23,9 @@ export default function App() {
     if (simulation?.status === 'complete') setIsPlaying(false)
   }, [simulation?.status])
 
-  function handleGenerate(pattern) {
+  function handleGenerate(pattern, text) {
     setIsPlaying(false)
-    setSimulation(createSimulation(pattern))
+    setSimulation(createSimulation(pattern, text))
   }
 
   function handleNext() {
@@ -68,9 +68,11 @@ export default function App() {
       </main>
 
       <footer className="site-footer">
-        <span>Aplicación web educativa para el curso Análisis de Algoritmos · compatible con GitHub Pages</span>
-        <a href="mailto:johanalexisbv@ufps.edu.co">johanalexisbv@ufps.edu.co</a>
-        <span>Versión 1.0.1</span>
+        <p><strong>Autores:</strong> Johan Alexis Barrera Vargas (1152538) · Joseer Sneider Carrillo Gónzalez (1152539)</p>
+        <p><a href="mailto:johanalexisbv@ufps.edu.co">johanalexisbv@ufps.edu.co</a> · 2028</p>
+        <p>Análisis de Algoritmos · Ingeniería de Sistemas · Universidad Francisco de Paula Santander</p>
+        <p>Cúcuta, Norte de Santander, Colombia · Profesor: Ph.D. Marco Antonio Adarme Jaimes</p>
+        <p><a href="https://github.com/DidelphisAlbiventris/Busqueda-Cadena-Karp-Rabin">Repositorio y documentación en GitHub</a></p>
       </footer>
     </div>
   )

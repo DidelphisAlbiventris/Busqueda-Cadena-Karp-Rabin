@@ -1,4 +1,3 @@
-export const TEXT_LENGTH = 30
 export const MIN_PATTERN_LENGTH = 2
 export const MAX_PATTERN_LENGTH = 5
 export const HASH_BASE = 256
@@ -14,20 +13,11 @@ export function validatePattern(pattern) {
   return ''
 }
 
-export function generateText(pattern, random = Math.random) {
-  const error = validatePattern(pattern)
-  if (error) throw new RangeError(error)
-
-  const patternCharacters = Array.from(pattern)
-  const alphabet = [...new Set(patternCharacters)]
-  const characters = Array.from(
-    { length: TEXT_LENGTH },
-    () => alphabet[Math.floor(random() * alphabet.length)],
-  )
-  const insertionIndex = Math.floor(random() * (TEXT_LENGTH - patternCharacters.length + 1))
-
-  characters.splice(insertionIndex, patternCharacters.length, ...patternCharacters)
-  return characters.join('')
+export function validateText(text, pattern) {
+  if (Array.from(text).length < Array.from(pattern).length) {
+    return 'La cadena de texto debe tener al menos tantos caracteres como el patrón.'
+  }
+  return ''
 }
 
 export function calculateHashSteps(value) {
@@ -69,16 +59,16 @@ function modularPower(base, exponent) {
   return result
 }
 
-export function createSimulation(pattern, text = generateText(pattern)) {
+export function createSimulation(pattern, text) {
   const error = validatePattern(pattern)
   if (error) throw new RangeError(error)
 
+  if (typeof text !== 'string') throw new TypeError('Introduce la cadena de texto.')
+  const textError = validateText(text, pattern)
+  if (textError) throw new RangeError(textError)
+
   const characters = Array.from(text)
   const patternLength = Array.from(pattern).length
-  if (characters.length < patternLength) {
-    throw new RangeError('La cadena generada no puede ser más corta que el patrón.')
-  }
-
   const highestPower = modularPower(HASH_BASE, patternLength - 1)
 
   return {

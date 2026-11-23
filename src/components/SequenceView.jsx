@@ -8,13 +8,13 @@ export default function SequenceView({ simulation }) {
   return (
     <div className="sequence-view">
       <code className="sr-only" aria-label="Cadena completa">{simulation.text}</code>
-      <ol className="sequence-grid" aria-label="Caracteres de la cadena generada" start={0}>
+      <ol className="sequence-grid" aria-label="Caracteres de la cadena de texto" start={0}>
         {simulation.characters.map((character, index) => {
           const active = current && index >= current.index && index < current.index + simulation.patternLength
           const matched = simulation.matchIndexes.some(
             (start) => index >= start && index < start + simulation.patternLength,
           )
-          const classes = ['character-cell', active && 'character-cell--active', matched && 'character-cell--matched']
+          const classes = ['character-cell', active && 'character-cell--active', matched && 'character-cell--matched', active && current.isCollision && 'character-cell--collision']
             .filter(Boolean).join(' ')
 
           return (
@@ -28,6 +28,7 @@ export default function SequenceView({ simulation }) {
       <div className="sequence-legend" aria-hidden="true">
         <span><i className="legend-dot legend-dot--active" /> Ventana actual</span>
         <span><i className="legend-dot legend-dot--matched" /> Coincidencia encontrada</span>
+        <span><i className="legend-dot legend-dot--collision" /> Colisión</span>
       </div>
     </div>
   )

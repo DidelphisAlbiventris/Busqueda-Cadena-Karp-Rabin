@@ -4,7 +4,7 @@ Aplicación web educativa para visualizar paso a paso la búsqueda de cadenas me
 
 ## Cómo funciona Karp-Rabin
 
-El simulador busca un patrón dentro de una cadena de 30 caracteres usando una ventana deslizante. Para cada ventana calcula un valor numérico y lo compara con el hash del patrón. Así puede descartar rápidamente una ventana cuyo hash sea diferente, sin comparar todos sus caracteres desde el inicio.
+El usuario introduce un patrón de 2 a 5 caracteres y la cadena de texto donde desea buscarlo. La cadena debe tener al menos la longitud del patrón y no necesita contenerlo. El simulador utiliza una ventana deslizante: calcula el hash de cada ventana y lo compara con el hash del patrón para descartar rápidamente las ventanas diferentes.
 
 El hash polinómico usa base `B = 256`, módulo `q = 101` y el código Unicode de cada carácter. Para una ventana de longitud `m`, la fórmula es:
 
@@ -16,12 +16,24 @@ Al desplazar la ventana una posición, el algoritmo elimina la contribución del
 
 Una igualdad de hashes solo indica una coincidencia candidata: el simulador compara también las cadenas para descartar colisiones. Cuando la comparación es exacta, guarda el índice inicial de la coincidencia; por eso también se pueden identificar coincidencias superpuestas.
 
+Las coincidencias se resaltan en verde y la ventana actual de una colisión se muestra en amarillo pálido. Una colisión ocurre cuando los hashes son iguales, pero los caracteres son distintos; su posición no se registra como coincidencia.
+
 La búsqueda puede ejecutarse paso a paso o reproducirse automáticamente con una pausa de 1,5 segundos entre ventanas. El índice de cada posición comienza en `0`.
 
 ## Requisitos
 
 - Node.js 20 o superior.
 - npm.
+
+## Autores y datos académicos
+
+- Johan Alexis Barrera Vargas — 1152538.
+- Joseer Sneider Carrillo Gónzalez — 1152539.
+- Correo de contacto: johanalexisbv@ufps.edu.co.
+- Análisis de Algoritmos, Ingeniería de Sistemas, Universidad Francisco de Paula Santander.
+- Profesor: Ph.D. Marco Antonio Adarme Jaimes.
+- Cúcuta, Norte de Santander, Colombia · 2028.
+- Repositorio: https://github.com/DidelphisAlbiventris/Busqueda-Cadena-Karp-Rabin
 
 ## Ejecutar en local
 

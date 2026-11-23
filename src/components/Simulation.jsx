@@ -10,12 +10,12 @@ export default function Simulation({ simulation, onNext, onRestart, isPlaying, o
   return (
     <section className="panel simulation-panel" aria-labelledby="simulation-heading">
       <div className="simulation-heading">
-        <h2 id="simulation-heading">Cadena generada</h2>
-        <span className={`pill${complete ? ' pill--complete' : ''}`}>{complete ? 'Completado' : simulation ? '30 caracteres' : 'Sin generar'}</span>
+        <h2 id="simulation-heading">Cadena de texto</h2>
+        <span className={`pill${complete ? ' pill--complete' : ''}`}>{complete ? 'Completado' : simulation ? `${simulation.characters.length} caracteres` : 'Sin iniciar'}</span>
       </div>
 
       {simulation ? <SequenceView simulation={simulation} /> : (
-        <p className="empty-sequence">Genera una cadena para comenzar.</p>
+        <p className="empty-sequence">Introduce el patrón y la cadena de texto para comenzar.</p>
       )}
 
       {simulation && (
@@ -28,7 +28,7 @@ export default function Simulation({ simulation, onNext, onRestart, isPlaying, o
           <span className="comparison-sign" aria-label={current ? current.hashMatches ? 'Hashes iguales' : 'Hashes distintos' : 'Sin comparar'}>
             {current ? current.hashMatches ? '=' : '≠' : '?'}
           </span>
-          <div className={`hash-card${current?.isMatch ? ' hash-card--match' : ''}`}>
+          <div className={`hash-card${current?.isMatch ? ' hash-card--match' : current?.isCollision ? ' hash-card--collision' : ''}`}>
             <span className="hash-label">{current ? `Ventana · índice ${current.index}` : 'Ventana actual'}</span>
             <code className="hash-word">{current?.substring ?? '—'}</code>
             <div className="hash-value"><span>Hash</span><strong>{current ? String(current.hash) : '—'}</strong></div>

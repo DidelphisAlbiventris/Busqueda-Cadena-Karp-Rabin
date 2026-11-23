@@ -1,13 +1,12 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {
-  TEXT_LENGTH,
   advanceSimulation,
   calculateHash,
   calculateHashSteps,
   createSimulation,
-  generateText,
   validatePattern,
+  validateText,
 } from './karpRabin.js'
 
 function finish(pattern, text) {
@@ -24,18 +23,15 @@ function finish(pattern, text) {
 test('validates patterns and supports Unicode', () => {
   for (const invalid of ['', 'a', 'abcdef', '😀']) assert.notEqual(validatePattern(invalid), '')
   for (const valid of ['ab', 'abc', 'abcd', '😀a', 'ñá', 'a ']) assert.equal(validatePattern(valid), '')
-  assert.throws(() => generateText('a'), RangeError)
   assert.throws(() => createSimulation('ab', 'a'), RangeError)
+  assert.throws(() => createSimulation('ab'), TypeError)
+  assert.notEqual(validateText('a', 'ab'), '')
+  assert.equal(validateText('😀a', 'ab'), '')
 })
 
-test('generates exactly 30 characters with a guaranteed occurrence', () => {
-  for (const pattern of ['ab', 'abc', 'abcd', 'aa', '😀ñ', 'a ']) {
-    for (const sample of [0, 0.25, 0.7, 0.999999]) {
-      const text = generateText(pattern, () => sample)
-      assert.equal(Array.from(text).length, TEXT_LENGTH)
-      assert.ok(text.includes(pattern))
-    }
-  }
+test('uses the supplied text, including text without the pattern', () => {
+  assert.equal(createSimulation('ab', 'cccc').text, 'cccc')
+  assert.deepEqual(finish('ab', 'cccc').matchIndexes, [])
 })
 
 test('the first click calculates only the pattern hash and its process', () => {
@@ -52,8 +48,8 @@ test('the first click calculates only the pattern hash and its process', () => {
 
 test('compares every window and stores the starting indexes of overlapping occurrences', () => {
   for (const pattern of ['aa', 'aaa', 'aaaa']) {
-    const simulation = finish(pattern, 'a'.repeat(TEXT_LENGTH))
-    const expectedCount = TEXT_LENGTH - pattern.length + 1
+    const simulation = finish(pattern, 'a'.repeat(30))
+    const expectedCount = 30 - pattern.length + 1
     assert.equal(simulation.history.length, expectedCount)
     assert.deepEqual(simulation.matchIndexes, Array.from({ length: expectedCount }, (_, index) => index))
     assert.equal(advanceSimulation(simulation), simulation)
