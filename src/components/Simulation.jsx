@@ -10,10 +10,12 @@ export default function Simulation({ simulation, onNext, onRestart, isPlaying, o
   return (
     <section className="panel simulation-panel" aria-labelledby="simulation-heading">
       <div className="simulation-heading">
-        <h2 id="simulation-heading">Cadena de texto</h2>
+        <h2 id="simulation-heading">Cadena principal</h2>
         <span className={`pill${complete ? ' pill--complete' : ''}`}>{complete ? 'Completado' : simulation ? `${simulation.characters.length} caracteres` : 'Sin iniciar'}</span>
       </div>
 
+      <div className={simulation ? "simulation-layout" : undefined}>
+      <div className="simulation-main">
       {simulation ? <SequenceView simulation={simulation} /> : (
         <p className="empty-sequence">Introduce el patrón y la cadena de texto para comenzar.</p>
       )}
@@ -52,7 +54,9 @@ export default function Simulation({ simulation, onNext, onRestart, isPlaying, o
         </div>
       </div>
 
+      </div>
       {simulation && <HashDetails simulation={simulation} />}
+      </div>
 
       {complete && (
         <section className="final-result" role="status" aria-live="polite" aria-labelledby="result-heading">

@@ -26,12 +26,15 @@ test('validates patterns and supports Unicode', () => {
   assert.throws(() => createSimulation('ab', 'a'), RangeError)
   assert.throws(() => createSimulation('ab'), TypeError)
   assert.notEqual(validateText('a', 'ab'), '')
-  assert.equal(validateText('😀a', 'ab'), '')
+  assert.equal(validateText('😀abcd', 'ab'), '')
+  assert.notEqual(validateText('abcd', 'ab'), '')
+  assert.equal(validateText('a'.repeat(100), 'ab'), '')
+  assert.notEqual(validateText('a'.repeat(101), 'ab'), '')
 })
 
 test('uses the supplied text, including text without the pattern', () => {
-  assert.equal(createSimulation('ab', 'cccc').text, 'cccc')
-  assert.deepEqual(finish('ab', 'cccc').matchIndexes, [])
+  assert.equal(createSimulation('ab', 'ccccc').text, 'ccccc')
+  assert.deepEqual(finish('ab', 'ccccc').matchIndexes, [])
 })
 
 test('the first click calculates only the pattern hash and its process', () => {
@@ -75,15 +78,15 @@ test('uses the classic polynomial hash with base 256 and modulus 101', () => {
 
 test('equal hashes with different characters are collisions, not matches', () => {
   assert.equal(calculateHash('ab'), calculateHash('b,'))
-  const simulation = finish('ab', 'b,ab')
+  const simulation = finish('ab', 'b,abc')
   assert.equal(simulation.history[0].isCollision, true)
   assert.equal(simulation.history[0].isMatch, false)
   assert.deepEqual(simulation.matchIndexes, [2])
 })
 
 test('search is case-sensitive and restart clears progress', () => {
-  assert.deepEqual(finish('Ab', 'abAb').matchIndexes, [2])
-  assert.deepEqual(finish('ab', 'cccc').matchIndexes, [])
+  assert.deepEqual(finish('Ab', 'abAbc').matchIndexes, [2])
+  assert.deepEqual(finish('ab', 'ccccc').matchIndexes, [])
   const completed = finish('ab', 'ababa')
   const restarted = createSimulation(completed.pattern, completed.text)
   assert.equal(restarted.patternHash, null)

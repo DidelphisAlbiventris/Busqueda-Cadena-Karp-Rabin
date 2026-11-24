@@ -68,8 +68,9 @@ export default function App() {
       </main>
 
       <footer className="site-footer">
+        <p>Simulador Karp-Rabin · v 1.3</p>
         <p><strong>Autores:</strong> Johan Alexis Barrera Vargas (1152538) · Joseer Sneider Carrillo Gónzalez (1152539)</p>
-        <p><a href="mailto:johanalexisbv@ufps.edu.co">johanalexisbv@ufps.edu.co</a> · 2028</p>
+        <p><a href="mailto:johanalexisbv@ufps.edu.co">johanalexisbv@ufps.edu.co</a> · 2026</p>
         <p>Análisis de Algoritmos · Ingeniería de Sistemas · Universidad Francisco de Paula Santander</p>
         <p>Cúcuta, Norte de Santander, Colombia · Profesor: Ph.D. Marco Antonio Adarme Jaimes</p>
         <p><a href="https://github.com/DidelphisAlbiventris/Busqueda-Cadena-Karp-Rabin">Repositorio y documentación en GitHub</a></p>

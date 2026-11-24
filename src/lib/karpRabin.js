@@ -1,5 +1,7 @@
 export const MIN_PATTERN_LENGTH = 2
 export const MAX_PATTERN_LENGTH = 5
+export const MIN_TEXT_LENGTH = 5
+export const MAX_TEXT_LENGTH = 100
 export const HASH_BASE = 256
 export const HASH_MODULUS = 101
 
@@ -14,7 +16,11 @@ export function validatePattern(pattern) {
 }
 
 export function validateText(text, pattern) {
-  if (Array.from(text).length < Array.from(pattern).length) {
+  const length = Array.from(text).length
+  if (length < MIN_TEXT_LENGTH || length > MAX_TEXT_LENGTH) {
+    return `La cadena principal debe tener entre ${MIN_TEXT_LENGTH} y ${MAX_TEXT_LENGTH} caracteres.`
+  }
+  if (length < Array.from(pattern).length) {
     return 'La cadena de texto debe tener al menos tantos caracteres como el patrón.'
   }
   return ''

@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { validatePattern, validateText } from './lib/karpRabin.js'
+import { MAX_TEXT_LENGTH, validatePattern, validateText } from './lib/karpRabin.js'
 
 export default function Formulario({ onGenerate }) {
   const [pattern, setPattern] = useState('')
   const [text, setText] = useState('')
   const [errors, setErrors] = useState({})
   const length = Array.from(pattern).length
+  const textLength = Array.from(text).length
 
   function handleSubmit(event) {
     event.preventDefault()
@@ -27,16 +28,17 @@ export default function Formulario({ onGenerate }) {
             onChange={(event) => { setPattern(event.target.value); setErrors({}) }} />
           <span className={length > 5 ? 'character-count character-count--error' : 'character-count'} aria-hidden="true">{length}/5</span>
         </div>
-        <p id="pattern-hint" className="field-hint">De 2 a 5 caracteres · distingue mayúsculas y minúsculas.</p>
+        <p id="pattern-hint" className="field-hint">La secuencia que quieres encontrar: de 2 a 5 caracteres · distingue mayúsculas y minúsculas.</p>
         {errors.pattern && <p id="pattern-error" className="field-error" role="alert">{errors.pattern}</p>}
-        <label className="text-label" htmlFor="search-text">Cadena de texto</label>
+        <label className="text-label" htmlFor="search-text">Cadena principal donde buscar</label>
         <div className={`input-wrap${errors.text ? ' input-wrap--error' : ''}`}>
           <input id="search-text" name="search-text" type="text" value={text} placeholder="Ej. abcabc"
             autoComplete="off" spellCheck={false} aria-invalid={Boolean(errors.text)}
             aria-describedby={errors.text ? 'text-hint text-error' : 'text-hint'}
-            onChange={(event) => { setText(event.target.value); setErrors({}) }} />
+            onChange={(event) => { setText(Array.from(event.target.value).slice(0, MAX_TEXT_LENGTH).join('')); setErrors({}) }} />
+          <span className="character-count" aria-hidden="true">{textLength}/{MAX_TEXT_LENGTH}</span>
         </div>
-        <p id="text-hint" className="field-hint">Escribe la cadena en la que deseas buscar el patrón.</p>
+        <p id="text-hint" className="field-hint">Texto completo en el que se buscará el patrón · de 5 a 100 caracteres.</p>
         {errors.text && <p id="text-error" className="field-error" role="alert">{errors.text}</p>}
         <button className="button button--primary start-button" type="submit">Iniciar simulación</button>
       </form>

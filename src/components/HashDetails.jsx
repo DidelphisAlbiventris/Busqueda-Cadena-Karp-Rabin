@@ -26,7 +26,7 @@ export default function HashDetails({ simulation }) {
       <h3 id="hash-details-heading">Proceso de cálculo del hash</h3>
       <p>Cada carácter Cᵢ se representa con su código Unicode y se multiplica por la potencia de la base que corresponde a su posición:</p>
       <code className="hash-formula">xᵢ = (Cᵢ × Bᵐ⁻¹ + Cᵢ₊₁ × Bᵐ⁻² + … + Cᵢ₊ₘ₋₁) mod {HASH_MODULUS}, con B = {HASH_BASE}</code>
-      <HashProcess title={`Cadena base: ${simulation?.pattern ?? '—'}`} steps={simulation?.patternHashSteps} />
+      <HashProcess title={`Patrón a buscar: ${simulation?.pattern ?? '—'}`} steps={simulation?.patternHashSteps} />
       <HashProcess title={current ? `Ventana ${current.index}: ${current.substring}` : 'Ventana actual'} steps={current?.hashSteps} />
       {current && (
         <div className="hash-verdict" role="status" aria-live="polite" aria-atomic="true">
