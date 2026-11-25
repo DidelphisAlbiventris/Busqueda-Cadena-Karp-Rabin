@@ -20,10 +20,6 @@ Las coincidencias se resaltan en verde y la ventana actual de una colisión se m
 
 La búsqueda puede ejecutarse paso a paso o reproducirse automáticamente con una pausa de 1,5 segundos entre ventanas. El índice de cada posición comienza en `0`.
 
-## Requisitos
-
-- Node.js 20 o superior.
-- npm.
 
 ## Autores y datos académicos
 
@@ -32,8 +28,13 @@ La búsqueda puede ejecutarse paso a paso o reproducirse automáticamente con un
 - Correo de contacto: johanalexisbv@ufps.edu.co.
 - Análisis de Algoritmos, Ingeniería de Sistemas, Universidad Francisco de Paula Santander.
 - Profesor: Ph.D. Marco Antonio Adarme Jaimes.
-- Cúcuta, Norte de Santander, Colombia · 2028.
+- Cúcuta, Norte de Santander, Colombia · 2026.
 - Repositorio: https://github.com/DidelphisAlbiventris/Busqueda-Cadena-Karp-Rabin
+
+## Requisitos
+
+- Node.js 20 o superior.
+- npm.
 
 ## Ejecutar en local
 
@@ -55,16 +56,6 @@ npm run preview
 ```
 
 El build se genera en `dist/` y no debe versionarse.
-
-## Publicar en GitHub Pages
-
-El workflow de [Deploy to GitHub Pages](./.github/workflows/deploy-pages.yml) compila y publica automáticamente cada push a `main`.
-
-1. Crea un repositorio en GitHub.
-2. Sube el proyecto a la rama `main`.
-3. En GitHub, entra en **Settings → Pages**.
-4. En **Build and deployment**, selecciona **GitHub Actions**.
-5. Espera la ejecución del workflow **Deploy to GitHub Pages**.
 
 La configuración de Vite detecta automáticamente el nombre del repositorio y ajusta la ruta base para un sitio de proyecto.
 
